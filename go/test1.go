@@ -95,6 +95,7 @@ type PendingTxItem struct {
 }
 
 func RemoveSlice(slice []PendingTxItem, start, end int) []PendingTxItem {
+	//注意如果是移除一个时，end = start + 1
 	return append(slice[:start], slice[end:]...)
 }
 
