@@ -5,6 +5,11 @@ import (
 	"path/filepath"
 	"io/ioutil"
 	"encoding/json"
+	"strings"
+	"errors"
+	"fmt"
+	"time"
+	"reflect"
 )
 
 type PendingTxItem struct {
@@ -20,6 +25,23 @@ func RemoveSlice(slice []PendingTxItem, start, end int) []PendingTxItem {
 	return append(slice[:start], slice[end:]...)
 }
 
+//结构体切片 变成 []interface
+//eg: []PendingTxItem --> []interface{}
+// 不能直接转 interface 可以接受任何类型， []interface{}不可以
+//[]interface{} = ToSlice([]PendingTxItem)
+func ToSlice(arr interface{}) []interface{} {
+	v := reflect.ValueOf(arr)
+	if v.Kind() != reflect.Slice {
+		panic("toslice arr not slice")
+	}
+	l := v.Len()
+	ret := make([]interface{}, l)
+	for i := 0; i < l; i++ {
+		ret[i] = v.Index(i).Interface()
+	}
+	return ret
+}
+
 //判断文件或文件夹是否存在
 func PathExists(path string) (bool, error) {
 	_, err := os.Stat(path)
@@ -32,6 +54,7 @@ func PathExists(path string) (bool, error) {
 	return false, err
 }
 
+//创建文件 如果目录不存在就创建目录再创建文件
 func CreatFile(fileName string) error {
 	dir := filepath.Dir(fileName)
 	if _, err := os.Stat(dir); err != nil {
@@ -54,6 +77,7 @@ func CreatFile(fileName string) error {
 	return nil
 }
 
+//读文件 不存在是否创建
 func ReadFile(fileName string, isCreat bool) ([]byte, error) {
 	//创建多级目录文件
 	if _, err := os.Stat(fileName); err != nil {
@@ -75,6 +99,7 @@ func ReadFile(fileName string, isCreat bool) ([]byte, error) {
 	return nil, nil
 }
 
+//写文件不存在会创建文件
 func WriteFile(fileName string, data []byte) error {
 	//创建多级目录文件
 	if _, err := os.Stat(fileName); err != nil {
@@ -92,6 +117,7 @@ func WriteFile(fileName string, data []byte) error {
 	return nil
 }
 
+//字符串解析成结构体，如果字符串为空 返回为true
 func JsonStrUnmarshal(data string, v interface{}) (bool, error) {
 	if data == "" {
 		return true, nil
@@ -100,4 +126,53 @@ func JsonStrUnmarshal(data string, v interface{}) (bool, error) {
 		return false, err
 	}
 	return false, nil
+}
+
+//去除字符串的所有空格， strings.TrimSpace(str) 只能去掉首尾空格
+func StrRemoveSpace(source string) string {
+	return strings.Replace(source, " ", "", -1)
+}
+
+//添加到字符串数组，不可重复添加
+func AddStr(strList []string, str string) ([]string, error) {
+	if ContainsStr(strList, str) {
+		return strList, errors.New("The member exist in the list")
+	}
+	return append(strList, str), nil
+}
+
+//从字符串数组中移除，必须在数组中包含
+func RemoveStr(strList []string, str string) ([]string, error) {
+	var index = int(-1)
+	for i, v := range strList {
+		if str == v {
+			index = i
+			break
+		}
+	}
+	if index < 0 {
+		return strList, errors.New("There's no exist the member:" + str)
+	}
+
+	return append(strList[:index], strList[index+1:]...), nil
+}
+
+//字符串数组中包含对应字符串
+func ContainsStr(strList []string, str string) bool {
+	for _, v := range strList {
+		if v == str {
+			return true
+		}
+	}
+	return false
+}
+
+//获取当前时间
+func getCurTime() uint64 {
+	return uint64(time.Now().UTC().Unix())
+}
+
+//彩色打印
+func colorPrint(log string) {
+	fmt.Printf("\033[1m\033[45;33m" + log + "\033[0m\n")
 }
