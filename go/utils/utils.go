@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"strings"
 	"errors"
+	"math/rand"
 	"fmt"
 	"time"
 	"reflect"
@@ -17,6 +18,32 @@ type PendingTxItem struct {
 	RootId     string `json:"RootId"`     //待处理交易根系列id
 	StepNo     uint32 `json:"StepNo"`     //待处理交易步骤编号
 	MemberType string `json:"MemberType"` //待处理交易交易的成员类型
+}
+//随机字符串
+const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+const (
+	letterIdxBits = 6                    // 6 bits to represent a letter index
+	letterIdxMask = 1<<letterIdxBits - 1 // All 1-bits, as many as letterIdxBits
+	letterIdxMax  = 63 / letterIdxBits   // # of letter indices fitting in 63 bits
+)
+
+var rnd = rand.NewSource(time.Now().UnixNano())
+func randomString(n int) string {
+	b := make([]byte, n)
+
+	for i, cache, remain := n-1, rnd.Int63(), letterIdxMax; i >= 0; {
+		if remain == 0 {
+			cache, remain = rnd.Int63(), letterIdxMax
+		}
+		if idx := int(cache & letterIdxMask); idx < len(letterBytes) {
+			b[i] = letterBytes[idx]
+			i--
+		}
+		cache >>= letterIdxBits
+		remain--
+	}
+
+	return string(b)
 }
 
 //从切片移除某项
