@@ -111,7 +111,7 @@ func ReadFile(fileName string, isCreat bool) ([]byte, error) {
 		if os.IsNotExist(err) {
 			if isCreat {
 				if err := CreatFile(fileName); err != nil {
-					return err
+					return nil,err
 				}
 				return ioutil.ReadFile(fileName)
 			} else {
@@ -123,7 +123,7 @@ func ReadFile(fileName string, isCreat bool) ([]byte, error) {
 			return nil, nil
 		}
 	}
-	return nil, nil
+	return ioutil.ReadFile(fileName)
 }
 
 //写文件不存在会创建文件
@@ -141,7 +141,7 @@ func WriteFile(fileName string, data []byte) error {
 			return nil
 		}
 	}
-	return nil
+	return ioutil.WriteFile(fileName, data, 0755)
 }
 
 //字符串解析成结构体，如果字符串为空 返回为true
