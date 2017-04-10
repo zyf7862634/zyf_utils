@@ -141,11 +141,11 @@ func WriteFile(fileName string, data []byte) error {
 }
 
 //字符串解析成结构体，如果字符串为空 返回为true
-func JsonStrUnmarshal(data string, v interface{}) (bool, error) {
-	if data == "" {
+func JsonStrUnmarshal(data []byte, v interface{}) (bool, error) {
+	if data == nil {
 		return true, nil
 	}
-	if err := json.Unmarshal([]byte(data), v); err != nil {
+	if err := json.Unmarshal(data, v); err != nil {
 		return false, err
 	}
 	return false, nil
@@ -193,6 +193,16 @@ func ContainsStr(strList []string, str string) bool {
 //获取当前时间
 func getCurTime() uint64 {
 	return uint64(time.Now().UTC().Unix())
+}
+
+//获取当前天数时间戳
+func GetCurData() int64 {
+	timeStr := time.Now().Format("2006-01-02")
+	//t, _ := time.Parse("2006-01-02", timeStr)//UTC is localTime + 8h
+	t, _ := time.ParseInLocation("2006-01-02", timeStr, time.Local)
+	timeNumber := t.Unix()
+	fmt.Println("timeNumber:", timeNumber)
+	return timeNumber
 }
 
 //彩色打印
