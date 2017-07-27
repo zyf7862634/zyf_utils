@@ -115,8 +115,10 @@ func ReadFile(fileName string, isCreat bool) ([]byte, error) {
 				}
 				return ioutil.ReadFile(fileName)
 			} else {
-				return nil, err
+				return nil, nil
 			}
+		} else if os.IsExist(err) {
+			return ioutil.ReadFile(fileName)
 		} else {
 			return nil, nil
 		}
@@ -133,8 +135,10 @@ func WriteFile(fileName string, data []byte) error {
 				return err
 			}
 			return ioutil.WriteFile(fileName, data, 0755)
+		} else if os.IsExist(err) {
+			return ioutil.WriteFile(fileName, data, 0755)
 		} else {
-			return err
+			return nil
 		}
 	}
 	return ioutil.WriteFile(fileName, data, 0755)
