@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"time"
 	"reflect"
+	"bytes"
 )
 
 type PendingTxItem struct {
@@ -202,4 +203,50 @@ func getCurTime() uint64 {
 //彩色打印
 func colorPrint(log string) {
 	fmt.Printf("\033[1m\033[45;33m" + log + "\033[0m\n")
+}
+
+
+func checkFileIsExist(filename string) bool {
+	if _, err := os.Stat(filename); os.IsNotExist(err) {
+		return false
+	}
+	return true
+}
+
+func ToChaincodeArgs(args ...string) [][]byte {
+	bargs := make([][]byte, len(args))
+	for i, arg := range args {
+		bargs[i] = []byte(arg)
+	}
+	return bargs
+}
+
+func ArrayToChaincodeArgs(args []string) [][]byte {
+	bargs := make([][]byte, len(args))
+	for i, arg := range args {
+		bargs[i] = []byte(arg)
+	}
+	return bargs
+}
+
+func BytesToString(b *[]byte) *string {
+	s := bytes.NewBuffer(*b)
+	r := s.String()
+	return &r
+}
+
+//JSONDecode json decode
+func JSONDecode(data []byte, ret interface{}) error {
+	if len(data) == 0 {
+		return errors.New("JsonDecode failed data is nil")
+	}
+	return json.Unmarshal(data, ret)
+}
+
+//JSONEncode json encode
+func JSONEncode(data interface{}) ([]byte, error) {
+	if data == nil {
+		return nil, errors.New("JSONEncode failed data is nil")
+	}
+	return json.Marshal(data)
 }
