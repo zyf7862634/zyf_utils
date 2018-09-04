@@ -50,9 +50,11 @@ func randomString(n int) string {
 	return string(b)
 }
 
-var logger = logging.MustGetLogger("event")
 //设置log级别
 func SetLog(level string)  error{
+	if level == "" {
+		level = "DEBUG"
+	}
 	format := logging.MustStringFormatter("%{shortfile} %{time:2006-01-02 15:04:05.000} [%{module}] %{level:.4s} : %{message}")
 	backend := logging.NewLogBackend(os.Stderr, "", 0)
 	backendFormatter := logging.NewBackendFormatter(backend, format)
@@ -60,7 +62,8 @@ func SetLog(level string)  error{
 	if err != nil{
 		return err
 	}
-	logging.SetBackend(backendFormatter).SetLevel(logLevel, "event") //map[key]value
+	//map[k]v; eg:  var logger = logging.MustGetLogger("event")
+	logging.SetBackend(backendFormatter).SetLevel(logLevel, "event")
 	return nil
 }
 
