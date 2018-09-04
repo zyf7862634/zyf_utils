@@ -14,6 +14,7 @@ import (
 	"bytes"
 	"bufio"
 	"io"
+	"github.com/op/go-logging"
 )
 
 type PendingTxItem struct {
@@ -47,6 +48,20 @@ func randomString(n int) string {
 	}
 
 	return string(b)
+}
+
+var logger = logging.MustGetLogger("event")
+//设置log级别
+func SetLog(level string)  error{
+	format := logging.MustStringFormatter("%{shortfile} %{time:2006-01-02 15:04:05.000} [%{module}] %{level:.4s} : %{message}")
+	backend := logging.NewLogBackend(os.Stderr, "", 0)
+	backendFormatter := logging.NewBackendFormatter(backend, format)
+	logLevel, err := logging.LogLevel(level)
+	if err != nil{
+		return err
+	}
+	logging.SetBackend(backendFormatter).SetLevel(logLevel, "event") //map[key]value
+	return nil
 }
 
 //从切片移除某项
@@ -245,8 +260,11 @@ func JSONDecode(data []byte, ret interface{}) error {
 	return json.Unmarshal(data, ret)
 }
 
+var loggera = logging.MustGetLogger("aaa")
+
 //JSONEncode json encode
 func JSONEncode(data interface{}) ([]byte, error) {
+	loggera.Debug("JSONEncodedd")
 	if data == nil {
 		return nil, errors.New("JSONEncode failed data is nil")
 	}
@@ -298,4 +316,9 @@ func ModifyHosts(filePath, newIp, domain string) error {
 		return err
 	}
 	return nil
+}
+
+//比较大小
+func min(a uint64, b uint64) uint64 {
+	return b ^ ((a ^ b) & (-(uint64(a-b) >> 63)))
 }
