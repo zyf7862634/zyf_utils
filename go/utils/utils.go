@@ -51,19 +51,19 @@ func randomString(n int) string {
 }
 
 //设置log级别
-func SetLog(level string)  error{
-	if level == "" {
-		level = "DEBUG"
+func SetLogLevel(modelLevel, modelName string)  error{
+	if modelLevel == "" {
+		modelLevel = "DEBUG"
 	}
 	format := logging.MustStringFormatter("%{shortfile} %{time:2006-01-02 15:04:05.000} [%{module}] %{level:.4s} : %{message}")
 	backend := logging.NewLogBackend(os.Stderr, "", 0)
 	backendFormatter := logging.NewBackendFormatter(backend, format)
-	logLevel, err := logging.LogLevel(level)
+	logLevel, err := logging.LogLevel(modelLevel)
 	if err != nil{
 		return err
 	}
 	//map[k]v; eg:  var logger = logging.MustGetLogger("event")
-	logging.SetBackend(backendFormatter).SetLevel(logLevel, "event")
+	logging.SetBackend(backendFormatter).SetLevel(logLevel, modelName)
 	return nil
 }
 
