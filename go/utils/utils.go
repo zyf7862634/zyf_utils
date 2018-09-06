@@ -325,3 +325,30 @@ func ModifyHosts(filePath, newIp, domain string) error {
 func min(a uint64, b uint64) uint64 {
 	return b ^ ((a ^ b) & (-(uint64(a-b) >> 63)))
 }
+
+//只打开一次文件，用同一个文件句柄，每次都清空写入
+func handlerWriteGlobalFile(){
+	fileName := "E:\\gopath\\src\\zyf_utils\\go\\mm.txt"
+	globalFile, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
+	if err != nil {
+		fmt.Println(err)
+	}
+	ticker := time.NewTicker(time.Second * 1)
+	mm := true
+	for {
+		select {
+		case <-ticker.C:
+			fmt.Println("2s timer")
+			globalFile.Truncate(0)
+			if mm {
+				globalFile.WriteAt([]byte("abc"),0)
+				mm = false
+			}else {
+				globalFile.WriteAt([]byte("123456"),0)
+				mm = true
+			}
+			globalFile.Sync()
+		}
+	}
+	fmt.Println(err)
+}
