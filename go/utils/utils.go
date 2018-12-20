@@ -352,3 +352,35 @@ func handlerWriteGlobalFile(){
 	}
 	fmt.Println(err)
 }
+
+type Callback func(str string)
+
+func Test(str string, callback Callback)  {
+	callback(str)
+	////pointer 转 string
+	//straddress := &callback
+	//strPiniter := fmt.Sprintf("%d", unsafe.Pointer(straddress))
+	//fmt.Println("connection is", strPiniter)
+	//
+	////string 转 pointer
+	//intPointer, _ := strconv.ParseInt(strPiniter, 10, 0)
+	//var pointer *Callback
+	//pointer = *(**Callback)(unsafe.Pointer(&intPointer))
+	//
+	//(Callback)(*pointer)(str)
+
+}
+
+//用匿名结构体解析
+func checkStruct() {
+	data := struct {
+		Type string
+		Content struct{
+			Channel string
+			Members []struct {MspId string}}
+	   } {}
+	bbba := `{"Id":"","Type":"Members","Content":{"Channel":"cbc","Members":[{"AnchorInfo":[{"host":"Org1MSP.5c1b34a2","port":7050}],"ChannelList":null,"MSPConfig":{"config":"=="},"MspId":"Org1MSP","Name":"测试成员0","Remark":"","Role":0,"Status":0}]},"Time":1545286818,"Sender":"Org0MSP","Receiver":null,"SignList":null,"Status":0,"Attachment":"=","Remark":""}`
+	json.Unmarshal([]byte(bbba), &data)
+
+	fmt.Printf("--------%#v--%v", data.Type,data.Content.Members[0].MspId)
+}
